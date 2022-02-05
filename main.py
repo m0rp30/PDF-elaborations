@@ -1,3 +1,5 @@
+# Created by Luca Canali (c)2022
+
 import fitz
 from os import path
 
