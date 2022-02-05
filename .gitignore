@@ -1,2 +1,5 @@
+# Protected files
 *.pdf
+
+# Aditional repl files
 .breackpoints
