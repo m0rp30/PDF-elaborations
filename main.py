@@ -1,7 +1,12 @@
-# Created by Luca Canali (c)2022
-
 import fitz
-from os import path
+import sys
+from os import path, makedirs
+
+source_filename = 'Source/CEDOLINI.pdf' # PDF with all paycheck
+
+# Check if source file exists or abort
+if(not path.exists(source_filename)):
+  sys.exit("[ERROR] - File is not found !")
 
 # The words is between this points
 # Items for the month and year
@@ -19,19 +24,17 @@ from os import path
 #(139.26002502441406, 150.3373260498047, 189.90003967285156, 163.51426696777344, 'LUCA', 22, 11, 3)
 #(316.49993896484375, 150.3373260498047, 417.77972412109375, 163.51426696777344, 'RSSMRL14D79R145S', 22, 11, 4)
 
-# Points for names and sourname
-name_r1 = 150.3373260498047  # [1] == r1
-name_r2 = 163.51426696777344 # [3] == r2
-name_c1 = 63.300010681152344 # [0] >= c1
-name_c2 = 316.49993896484375 # [0] < c2
-# Point for month and date
-data_r1 = 109.61735534667969
-data_r2 = 122.79430389404297
-data_c1 = 341.81988525390625  # column start month
-data_c2 = 405.1197509765625   # column end month and start year
-data_c3 = 449.4296569824219   # column end year
-
-cedolini = 'CEDOLINI.pdf' # PDF with all paycheck
+# Points position for names and sourname
+name_r1 = 150.3373260498047   # That is the upper position of row's [1] == r1
+name_r2 = 163.51426696777344  # That is the bottom position of row's [3] == r2
+name_c1 = 63.300010681152344  # That is the start position of column's [0] >= c1
+name_c2 = 316.49993896484375  # That is the end position of column's[0] < c2
+# Points position for month and year
+data_r1 = 109.61735534667969  # That is the upper position of row's
+data_r2 = 122.79430389404297  # That is the bottom position of row's
+data_c1 = 341.81988525390625  # That is the start position of column's
+data_c2 = 405.1197509765625   # That is the middle position of column's
+data_c3 = 449.4296569824219   # That is the end position of column's
 
 # Translation dictionary from month to number 
 month_to_int = {
@@ -48,10 +51,10 @@ month_to_int = {
   "Novembre": "11",
   "Dicembre": "12"}
 
-doc = fitz.open(cedolini) # Open file cedolini with PyMuPDF
+doc = fitz.open(source_filename) # Open file cedolini with PyMuPDF
 
 # Iterate all pages in PDF
-for page in doc: # If you want get only a range use doc.pages(START, STOP, STEP)
+for page in doc.pages(0, 20, 1): # If you want get only a range use doc.pages(START, STOP, STEP)
   words = page.get_text("words")  # Make a list of words, from the document, with points that delimit it
   # Variables for name, month, year and filename of output
   name = ''
@@ -76,9 +79,15 @@ for page in doc: # If you want get only a range use doc.pages(START, STOP, STEP)
       year = i[4]
   
   # Make a output filename with name, month, year and extension
-  output_filename = name + '_' + month_to_int[month] + '_' + year + '.pdf'
+  destination_folder = 'Destination/' + name + '/'
+  filename = name + '_' + month_to_int[month] + '_' + year + '.pdf'
+  output_filename = destination_folder + filename
   
-  #TODO: If file already exists merge it with new page
+  # If directory don't exists
+  if(not path.exists(destination_folder)):
+    makedirs(destination_folder)
+  
+  #If file already exists merge it with new page
   if(path.exists(output_filename)):
     # Open a file called output_filename
     output_doc = fitz.open(output_filename)
@@ -89,7 +98,7 @@ for page in doc: # If you want get only a range use doc.pages(START, STOP, STEP)
     output_doc = fitz.open()
     output_doc.insert_pdf(doc, from_page=page.number, to_page=page.number)
     output_doc.save(output_filename)
-  
+
   # Close the output file
   output_doc.close()
 
