@@ -84,7 +84,7 @@ def make_cedolini():
   doc = fitz.open(source_filename) # Open file
 
   # Iterate all pages in PDF
-  for page in doc.pages(0, doc.page_count-1, 1): # Range of pages doc.pages(START, STOP, STEP)
+  for page in doc.pages(0, 11, 1): # Range of pages doc.pages(START, STOP, STEP)
     words_of_page = page.get_text("words")  # Create a list of items that contain the words of the current page
 
     # If the page is empty, skip it
