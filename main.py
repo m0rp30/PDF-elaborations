@@ -1,21 +1,6 @@
 """
 Get a document, from source directory, with all paycheck of every workers and split it in many PDF one for every worker, the pdf can has one or more pages
 
-# The get_text("word") function of the library PyMuPDF extracts the words as show below
-# Example of items that contain the words for month and year
-(341.81988525390625, 109.61735534667969, 386.1297912597656, 122.79430389404297, 'Ottobre', 22, 7, 3)
-(405.1197509765625, 109.61735534667969, 430.439697265625, 122.79430389404297, '2021', 22, 7, 4)
-(449.4296569824219, 109.61735534667969, 468.41961669921875, 122.79430389404297, 'Del', 22, 7, 5)
-
-# Example of items that contain the words for first and last names
-(63.300010681152344, 150.3373260498047, 88.6200180053711, 163.51426696777344, 'ROSSI', 22, 11, 1)
-(94.95001983642578, 150.3373260498047, 132.93002319335938, 163.51426696777344, 'MARIO', 22, 11, 2)
-(316.49993896484375, 150.3373260498047, 417.77972412109375, 163.51426696777344, 'RSSMRA14D79R145S', 22, 11, 3)
-
-(63.300010681152344, 150.3373260498047, 88.6200180053711, 163.51426696777344, 'ROSSI', 22, 11, 1)
-(94.95001983642578, 150.3373260498047, 132.93002319335938, 163.51426696777344, 'DAVIDE', 22, 11, 2)
-(139.26002502441406, 150.3373260498047, 189.90003967285156, 163.51426696777344, 'LUCA', 22, 11, 3)
-(316.49993896484375, 150.3373260498047, 417.77972412109375, 163.51426696777344, 'RSSMRL14D79R145S', 22, 11, 4)
 """
 
 import fitz
@@ -63,7 +48,7 @@ def save_file(file, doc, page_number):
   
   output_doc.close() # Close the file
 
-# TODO: Make a generic function for different documents, for my case cedolini and staced
+#### TODO: Make a generic function for different documents, for my case cedolini and staced
 def make_cedolini():
   # This row and poit is pecific for my document
   # Points position for names and sourname
@@ -84,7 +69,7 @@ def make_cedolini():
   doc = fitz.open(source_filename) # Open file
 
   # Iterate all pages in PDF
-  for page in doc.pages(0, 11): # Range of pages doc.pages(START, STOP, STEP) doc.page_count-1 
+  for page in doc.pages(0, doc.page_count): # Range of pages doc.pages(START, STOP, STEP) doc.page_count-1 
     words_of_page = page.get_text("words")  # Create a list of items that contain the words of the current page
 
     # If the page is empty, skip it
@@ -127,7 +112,7 @@ def make_staced():
   name_p2 = 582.5955200195312
   data_row = 51.390953063964844
   data_p1 = 20.99901580810547 # Page's margin left
-  data_p2 = 323.3979797363281
+  data_p2 = 323.3979797363281 # Middle poit
   data_p3 = 582.5955200195312 # Pages's margin right
   source_filename = "Source/STACED.pdf"
 
@@ -137,7 +122,7 @@ def make_staced():
   doc = fitz.open(source_filename) # Open file
 
   # Iterate all pages in PDF
-  for page in doc.pages(-11): # Range of pages doc.pages(START, STOP, STEP) doc.page_count-1 
+  for page in doc.pages(0, doc.page_count): # Range of pages doc.pages(START, STOP, STEP) doc.page_count-1 
     words_of_page = page.get_text("words")  # Create a list of items that contain the words of the current page
 
     # If the page is empty, skip it
@@ -162,6 +147,6 @@ def make_staced():
   doc.close() # Close the main file
 
 if __name__ == "__main__":
-  #make_cedolini()
+  make_cedolini()
   make_staced()
   print("finish!")
