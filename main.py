@@ -5,7 +5,9 @@ Get a document, from source directory, with all paycheck of every workers and sp
 ### LIBRARY
 import fitz
 import sys
-from os import path, makedirs
+import time
+from os import path, makedirs, getpid
+from multiprocessing import Process
 
 
 ### VARIABLES AND CONSTATNS
@@ -54,6 +56,8 @@ def save_file(file, doc, page_number):
 
 
 def make_document(source_filename, name_row, name_p1, name_p2, data_row, data_p1, data_p2, data_p3):
+  print('Start process id:', getpid())
+  start_time = time.time()
 
   # Check if the source file exists and open or abort programm
   if(not path.exists(source_filename)):
@@ -83,11 +87,13 @@ def make_document(source_filename, name_row, name_p1, name_p2, data_row, data_p1
       if(not path.exists(destination_folder)):
         makedirs(destination_folder)
       save_file(output_filename, doc, page.number) # Save or append current page in the pdf
+  print('Finish process id:', getpid())
+  print("--- %s seconds ---" % (time.time() - start_time))
 
 
 ### MAIN
 if __name__ == "__main__":
-  
+
   # CEDOLINI
   source_filename = 'Source/CEDOLINI_SOCI.pdf'
   name_row = 163.51426696777344 # line_no 11
@@ -97,7 +103,8 @@ if __name__ == "__main__":
   data_p1 = 341.81988525390625
   data_p2 = 405.1197509765625
   data_p3 = 449.4296569824219
-  make_document(source_filename, name_row, name_p1, name_p2, data_row, data_p1, data_p2, data_p3)
+  cedolini = Process(target=make_document, args=(source_filename, name_row, name_p1, name_p2, data_row, data_p1, data_p2, data_p3,))
+  #make_document(source_filename, name_row, name_p1, name_p2, data_row, data_p1, data_p2, data_p3)
 
   # STACED
   source_filename = 'Source/STACED_SOCI.pdf'
@@ -108,5 +115,12 @@ if __name__ == "__main__":
   data_p1 = 20.99901580810547
   data_p2 = 323.3979797363281
   data_p3 = 582.5955200195312
-  make_document(source_filename, name_row, name_p1, name_p2, data_row, data_p1, data_p2, data_p3)
+  staced = Process(target=make_document, args=(source_filename, name_row, name_p1, name_p2, data_row, data_p1, data_p2, data_p3,))
+  
+  cedolini.start()
+  staced.start()
+
+  cedolini.join()
+  staced.join()
+  #make_document(source_filename, name_row, name_p1, name_p2, data_row, data_p1, data_p2, data_p3)
   print("finish!")
